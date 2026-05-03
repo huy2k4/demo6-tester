@@ -11,6 +11,8 @@ export class RegisterPage extends BasePage {
     private dtpDateOfBirth: Locator;
     private selGender: Locator;
     private btnRegister: Locator;
+    private lblAlreadyHaveAccount: Locator;
+    private lnkLoginHere: Locator;
 
     constructor(page: Page) {
         super(page);
@@ -23,6 +25,8 @@ export class RegisterPage extends BasePage {
         this.dtpDateOfBirth = page.locator("#dateOfBirth");
         this.selGender = page.locator("#gender");
         this.btnRegister = page.getByRole("button", { name: "Register" });
+        this.lblAlreadyHaveAccount = page.locator("p").filter({ hasText: "Already have an account?" });
+        this.lnkLoginHere = page.getByRole("link", { name: "Login here" });
     }
 
     async enterUsername(username: string) { await this.inputText(this.txtUsername, username); }
@@ -46,4 +50,9 @@ export class RegisterPage extends BasePage {
         await this.selectGender(user.gender);
         await this.clickRegister();
     }
+
+    // Methods cho TC3, TC4
+    getAlreadyHaveAccountLabel() { return this.lblAlreadyHaveAccount; }
+    getLoginHereLink() { return this.lnkLoginHere; }
+    async clickLoginHere() { await this.click(this.lnkLoginHere); }
 }
