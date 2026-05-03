@@ -7,17 +7,15 @@ export default defineConfig({
   retries: 0,
   workers: undefined,
   reporter: 'html',
+  quiet: false,
   use: {
     baseURL: 'https://demo6.cybersoft.edu.vn',
     trace: 'on-first-retry',
-    launchOptions: {
-      slowMo: 1500, // Nghỉ 1.5 giây giữa mỗi thao tác để mắt người kịp nhìn
-    }
   },
   projects: [
     {
-      name: 'Microsoft Edge',
-      use: { ...devices['Desktop Edge'], channel: 'msedge' },
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
     },
   ],
 });
