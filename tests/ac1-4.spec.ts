@@ -1,54 +1,69 @@
 import { test, expect } from '../fixtures/custom-fixtures';
 
-test.describe('Acceptance Criteria 1-4 (Assignee: Huy)', () => {
+test.describe('Acceptance Criteria 1-4 (Assignee: Huy) - Registration Phase', () => {
 
-    test('TC1: Home header hiển thị nút “Đăng nhập” đúng thiết kế và tương tác hover', async ({ homePage, page }) => {
-        // Mở trang chủ
-        await page.goto("/");
-
-        const btnLogin = homePage.getLoginButton();
-        
-        // Kiểm tra nút Đăng nhập có hiển thị hay không
-        await expect(btnLogin).toBeVisible();
-
-        // Kiểm tra tương tác hover
-        await btnLogin.hover();
-        // Bạn có thể thêm expect về màu sắc hoặc cursor tại đây dựa trên requirement thực tế.
-    });
-
-    test('TC2: Điều hướng từ Home sang Login khi click “Đăng nhập”', async ({ homePage, page }) => {
-        await page.goto("/");
-        
-        // Click vào nút Đăng Nhập trên Header
-        await homePage.clickLoginHeader();
-
-        // Kiểm tra URL có chứa từ khoá /login
-        await expect(page).toHaveURL(/.*\/login/);
-    });
-
-    test('TC3: Register page hiển thị đúng cụm “Already have an account? Login here” và chỉ “Login here” clickable', async ({ registerPage, page }) => {
+    test('REGISTER_001 (AC1): Kiểm tra form đăng ký tài khoản hiển thị đầy đủ các trường dữ liệu', async ({ registerPage, page }) => {
         await page.goto("/register");
 
-        const lblText = registerPage.getAlreadyHaveAccountLabel();
-        const lnkLoginHere = registerPage.getLoginHereLink();
-
-        // Kiểm tra nguyên câu hiển thị chính xác
-        await expect(lblText).toBeVisible();
-        await expect(lblText).toContainText("Already have an account?");
-
-        // Kiểm tra chữ "Login here" là thẻ link có thể click được (enabled)
-        await expect(lnkLoginHere).toBeVisible();
-        await expect(lnkLoginHere).toBeEnabled();
+        // Kiểm tra sự xuất hiện của tất cả các trường dữ liệu
+        await expect(registerPage.getTxtUsername()).toBeVisible();
+        await expect(registerPage.getTxtFullName()).toBeVisible();
+        await expect(registerPage.getTxtEmail()).toBeVisible();
+        await expect(registerPage.getTxtPhone()).toBeVisible();
+        await expect(registerPage.getTxtPassword()).toBeVisible();
+        await expect(registerPage.getTxtConfirmPassword()).toBeVisible();
+        await expect(registerPage.getDtpDateOfBirth()).toBeVisible();
+        await expect(registerPage.getSelGender()).toBeVisible();
+        
+        // Kiểm tra button đăng ký
+        await expect(registerPage.getBtnRegister()).toBeVisible();
     });
 
-    test('TC4: Điều hướng từ Register sang Login khi click “Login here”', async ({ registerPage, page }) => {
+    test('REGISTER_002 (AC1): Kiểm tra tất cả nội dung hiển thị trên form đăng ký bằng tiếng việt', async ({ registerPage, page }) => {
         await page.goto("/register");
 
-        // Click chữ Login Here
-        await registerPage.clickLoginHere();
+        // Kiểm tra placeholder bằng tiếng Việt
+        // Lưu ý: Test này sẽ bị FAILED nếu trang web thực tế (demo6) đang code bằng tiếng Anh (ví dụ "Username *"). 
+        // Đây chính là tác dụng của testcase: tìm ra lỗi dịch thuật của Dev!
+        await expect(registerPage.getTxtUsername()).toHaveAttribute("placeholder", /Tên đăng nhập/i);
+        await expect(registerPage.getTxtFullName()).toHaveAttribute("placeholder", /Họ (và )?tên/i);
+        
+        // Kiểm tra Label (Dùng locator trực tiếp vì label đứng ngoài thẻ input)
+        await expect(page.locator("label[for='dateOfBirth']")).toHaveText(/Ngày sinh/i);
+        await expect(page.locator("label[for='gender']")).toHaveText(/Giới tính/i);
+        
+        // Kiểm tra Button
+        await expect(registerPage.getBtnRegister()).toHaveText(/Đăng ký/i);
+    });
 
-        // Xác minh đường dẫn được chuyển về trang Đăng Nhập
-        await expect(page).toHaveURL(/.*\/login/);
+    test('REGISTER_003 (AC2): Kiểm tra nhập 49 ký tự cho trường dữ liệu "Tên đăng nhập"', async ({ registerPage, page }) => {
+        await page.goto("/register");
+        
+        // Tạo chuỗi 49 ký tự 'a'
+        const username49 = "a".repeat(49);
+        await registerPage.enterUsername(username49);
+        
+        // Kiểm tra hệ thống cho phép nhập và giữ nguyên đủ 49 ký tự trong ô input
+        await expect(registerPage.getTxtUsername()).toHaveValue(username49);
+    });
+
+    test('REGISTER_004 (AC2): Kiểm tra nhập tối đa 50 ký tự cho trường dữ liệu "Tên đăng nhập"', async ({ registerPage, page }) => {
+        await page.goto("/register");
+        
+        // Bước 1: Nhập 49 ký tự
+        const username49 = "a".repeat(49);
+        await registerPage.enterUsername(username49);
+        
+        // Bước 2: Nhập thêm 1 ký tự (tổng 50)
+        const username50 = username49 + "b";
+        // Fill đè lên (hoặc type thêm)
+        await registerPage.enterUsername(username50);
+        
+        // Hệ thống cho phép hiển thị đủ 50 ký tự
+        await expect(registerPage.getTxtUsername()).toHaveValue(username50);
+
+        // (Bonus kịch bản ẩn) Nếu field có thuộc tính maxlength="50", ta có thể verify nó:
+        // await expect(registerPage.getTxtUsername()).toHaveAttribute("maxlength", "50");
     });
 
 });

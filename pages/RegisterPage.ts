@@ -51,8 +51,19 @@ export class RegisterPage extends BasePage {
         await this.clickRegister();
     }
 
-    // Methods cho TC3, TC4
+    // Methods cho TC3, TC4 cũ và UI assertions mới
     getAlreadyHaveAccountLabel() { return this.lblAlreadyHaveAccount; }
     getLoginHereLink() { return this.lnkLoginHere; }
     async clickLoginHere() { await this.click(this.lnkLoginHere); }
+
+    // Getters cho các fields để assert UI
+    getTxtUsername() { return this.txtUsername; }
+    getTxtFullName() { return this.txtFullName; }
+    getTxtEmail() { return this.txtEmail; }
+    getTxtPhone() { return this.txtPhone; }
+    getTxtPassword() { return this.txtPassword; }
+    getTxtConfirmPassword() { return this.txtConfirmPassword; }
+    getDtpDateOfBirth() { return this.dtpDateOfBirth; }
+    getSelGender() { return this.selGender; }
+    getBtnRegister() { return this.btnRegister; }
 }
