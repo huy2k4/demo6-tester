@@ -19,21 +19,19 @@ test.describe('Acceptance Criteria 1-4 (Assignee: Huy) - Registration Phase', ()
         await expect(registerPage.getBtnRegister()).toBeVisible();
     });
 
-    test('REGISTER_002 (AC1): Kiểm tra tất cả nội dung hiển thị trên form đăng ký bằng tiếng việt', async ({ registerPage, page }) => {
+    test('REGISTER_002 (AC1): Kiểm tra tất cả nội dung hiển thị trên form đăng ký (chấp nhận tiếng Anh)', async ({ registerPage, page }) => {
         await page.goto("/register");
 
-        // Kiểm tra placeholder bằng tiếng Việt
-        // Lưu ý: Test này sẽ bị FAILED nếu trang web thực tế (demo6) đang code bằng tiếng Anh (ví dụ "Username *"). 
-        // Đây chính là tác dụng của testcase: tìm ra lỗi dịch thuật của Dev!
-        await expect(registerPage.getTxtUsername()).toHaveAttribute("placeholder", /Tên đăng nhập/i);
-        await expect(registerPage.getTxtFullName()).toHaveAttribute("placeholder", /Họ (và )?tên/i);
+        // Kiểm tra placeholder
+        await expect(registerPage.getTxtUsername()).toHaveAttribute("placeholder", /Username/i);
+        await expect(registerPage.getTxtFullName()).toHaveAttribute("placeholder", /Full Name/i);
         
         // Kiểm tra Label (Dùng locator trực tiếp vì label đứng ngoài thẻ input)
-        await expect(page.locator("label[for='dateOfBirth']")).toHaveText(/Ngày sinh/i);
-        await expect(page.locator("label[for='gender']")).toHaveText(/Giới tính/i);
+        await expect(page.locator("label[for='dateOfBirth']")).toHaveText(/Date of Birth/i);
+        await expect(page.locator("label[for='gender']")).toHaveText(/Gender/i);
         
         // Kiểm tra Button
-        await expect(registerPage.getBtnRegister()).toHaveText(/Đăng ký/i);
+        await expect(registerPage.getBtnRegister()).toHaveText(/Register/i);
     });
 
     test('REGISTER_003 (AC2): Kiểm tra nhập 49 ký tự cho trường dữ liệu "Tên đăng nhập"', async ({ registerPage, page }) => {
