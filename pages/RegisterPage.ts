@@ -51,7 +51,7 @@ export class RegisterPage extends BasePage {
         await this.clickRegister();
     }
 
-    // Methods cho TC3, TC4 cũ và UI assertions mới
+    // Methods cho TC3, TC4 cũ
     getAlreadyHaveAccountLabel() { return this.lblAlreadyHaveAccount; }
     getLoginHereLink() { return this.lnkLoginHere; }
     async clickLoginHere() { await this.click(this.lnkLoginHere); }
@@ -66,4 +66,9 @@ export class RegisterPage extends BasePage {
     getDtpDateOfBirth() { return this.dtpDateOfBirth; }
     getSelGender() { return this.selGender; }
     getBtnRegister() { return this.btnRegister; }
+
+    // Lấy thông báo lỗi động dựa trên text
+    getErrorMessage(messageText: string) {
+        return this.page.locator(`text="${messageText}"`);
+    }
 }
