@@ -46,4 +46,20 @@ export class RegisterPage extends BasePage {
         await this.selectGender(user.gender);
         await this.clickRegister();
     }
+    // Getters cho các fields để assert UI
+    getTxtUsername() { return this.txtUsername; }
+    getTxtFullName() { return this.txtFullName; }
+    getTxtEmail() { return this.txtEmail; }
+    getTxtPhone() { return this.txtPhone; }
+    getTxtPassword() { return this.txtPassword; }
+    getTxtConfirmPassword() { return this.txtConfirmPassword; }
+    getDtpDateOfBirth() { return this.dtpDateOfBirth; }
+    getSelGender() { return this.selGender; }
+    getBtnRegister() { return this.btnRegister; }
+
+    // Lấy thông báo lỗi động dựa trên text hoặc name của input
+    getErrorMessage(messageText: string) {
+        // Tìm element chứa text thông báo lỗi
+        return this.page.locator(`text="${messageText}"`);
+    }
 }
