@@ -2,58 +2,95 @@ import { test, expect } from '../fixtures/custom-fixtures';
 
 test.describe('AC3: Full Name Field Validation', () => {
 
-    test('TC_AC3_01: Placeholder hiển thị "Họ và tên"', async ({ registerPage, page }) => {
-        await page.goto("/register");
-        await expect(registerPage.getTxtFullName()).toHaveAttribute("placeholder", "Họ và tên");
+    test.beforeEach(async ({ page }) => {
+        await page.goto('/register');
     });
 
-    test('TC_AC3_02: Cho phép nhập tối đa 50 ký tự', async ({ registerPage, page }) => {
-        await page.goto("/register");
-        // Nhập 50 ký tự hợp lệ
-        const fullName50 = "Nguyễn Văn " + "A".repeat(39);
-        await registerPage.enterFullName(fullName50);
+    test('REGISTER_007: Kiểm tra nhập 49 ký tự ở trường dữ liệu "Họ và tên"', async ({ registerPage }) => {
+        const fullName49 = 'A'.repeat(49);
+        await registerPage.enterFullName(fullName49);
+
+        // Hệ thống cho phép nhập 49 ký tự
+        await expect(registerPage.getTxtFullName()).toHaveValue(fullName49);
+    });
+
+    test('REGISTER_008: Kiểm tra nhập 50 ký tự ở trường dữ liệu "Họ và tên"', async ({ registerPage }) => {
+        // Pre-condition: đã nhập 49 ký tự
+        const fullName49 = 'A'.repeat(49);
+        await registerPage.enterFullName(fullName49);
+
+        // Nhập thêm 1 ký tự (tổng = 50)
+        await registerPage.getTxtFullName().press('B');
+
+        // Hệ thống cho phép nhập 50 ký tự
+        const fullName50 = fullName49 + 'B';
         await expect(registerPage.getTxtFullName()).toHaveValue(fullName50);
     });
 
-    test('TC_AC3_03: Nếu nhập quá 50 ký tự, hệ thống tự động chặn lại', async ({ registerPage, page }) => {
-        await page.goto("/register");
-        
-        await expect(registerPage.getTxtFullName()).toHaveAttribute("maxlength", "50");
-        
-        // Thử ép điền 51 ký tự
-        const fullName51 = "Nguyễn Văn " + "A".repeat(40);
-        await registerPage.getTxtFullName().fill(fullName51);
-        
-        const fullName50 = "Nguyễn Văn " + "A".repeat(39);
+    test('REGISTER_009: Kiểm tra nhập 51 ký tự ở trường dữ liệu "Họ và tên"', async ({ registerPage }) => {
+        // Pre-condition: đã nhập 50 ký tự
+        const fullName50 = 'A'.repeat(50);
+        await registerPage.getTxtFullName().fill(fullName50);
+
+        // Cố nhập thêm 1 ký tự thứ 51
+        await registerPage.getTxtFullName().press('B');
+
+        // Hệ thống tự động ngăn nhập ký tự thứ 51, chỉ giữ lại 50
         await expect(registerPage.getTxtFullName()).toHaveValue(fullName50);
     });
 
-    test('TC_AC3_04: Chỉ cho phép ký tự chữ cái (Unicode) và khoảng trắng', async ({ registerPage, page }) => {
-        await page.goto("/register");
-        
-        // Nhập số và ký tự đặc biệt
-        await registerPage.enterFullName("Nguyễn Văn A 123 @#");
-        
-        // Nhấn nút submit để validate
-        await registerPage.getBtnRegister().click();
-        
-        // Tuỳ theo thiết kế hệ thống, có thể nó xoá đi tự động hoặc hiển thị lỗi
-        // Ở đây giả định nó báo lỗi định dạng (sửa lại theo UI thực tế nếu cần)
-        // const errMsg = registerPage.getErrorMessage("Chỉ cho phép ký tự chữ và khoảng trắng");
-        // await expect(errMsg).toBeVisible();
+    test('REGISTER_010: Kiểm tra nhập tên tiếng Việt có dấu vào trường dữ liệu "Họ và tên"', async ({ registerPage }) => {
+        const testData = 'Nguyễn Thị Thảo';
+        await registerPage.enterFullName(testData);
+
+        // Hệ thống cho phép nhập chữ cái tiếng Việt có dấu và khoảng trắng
+        await expect(registerPage.getTxtFullName()).toHaveValue(testData);
     });
 
-    test('TC_AC3_05: Bỏ trống trường Họ và tên hiển thị thông báo lỗi', async ({ registerPage, page }) => {
-        await page.goto("/register");
-        
-        // Trigger validation
-        await registerPage.getTxtFullName().click();
+    test('REGISTER_011: Kiểm tra nhập tên tiếng Anh vào trường dữ liệu "Họ và tên"', async ({ registerPage }) => {
+        const testData = 'John Smith';
+        await registerPage.enterFullName(testData);
+
+        // Hệ thống cho phép nhập chữ cái tiếng Anh và khoảng trắng
+        await expect(registerPage.getTxtFullName()).toHaveValue(testData);
+    });
+
+    test('REGISTER_012: Kiểm tra nhập tên tiếng Việt trộn tiếng Anh vào trường dữ liệu "Họ và tên"', async ({ registerPage }) => {
+        const testData = 'Nguyễn Thị Anna';
+        await registerPage.enterFullName(testData);
+
+        // Hệ thống cho phép nhập chữ cái tiếng Việt trộn tiếng Anh và khoảng trắng
+        await expect(registerPage.getTxtFullName()).toHaveValue(testData);
+    });
+
+    test('REGISTER_013: Kiểm tra nhập số vào trường dữ liệu "Họ và tên"', async ({ registerPage }) => {
+        const testData = 'Thảo124533';
+        await registerPage.enterFullName(testData);
         await registerPage.getBtnRegister().click();
 
-        // Sử dụng nth(1) nếu Form có nhiều trường bắt buộc cùng báo lỗi "Vui lòng điền vào trường này" 
-        // Hoặc first() nếu nó là lỗi đầu tiên xuất hiện
-        const errMsg = registerPage.getErrorMessage("Vui lòng điền vào trường này");
-        await expect(errMsg.nth(1)).toBeVisible(); 
+        // Hệ thống hiển thị thông báo lỗi định dạng
+        const errMsg = registerPage.getErrorMessage('Họ và tên chỉ bao gồm chữ cái (Unicode) và khoảng trắng');
+        await expect(errMsg).toBeVisible();
+    });
+
+    test('REGISTER_014: Kiểm tra nhập ký tự đặc biệt vào trường dữ liệu "Họ và tên"', async ({ registerPage }) => {
+        const testData = 'Thảo@#$^*';
+        await registerPage.enterFullName(testData);
+        await registerPage.getBtnRegister().click();
+
+        // Hệ thống hiển thị thông báo lỗi định dạng
+        const errMsg = registerPage.getErrorMessage('Họ và tên chỉ bao gồm chữ cái (Unicode) và khoảng trắng');
+        await expect(errMsg).toBeVisible();
+    });
+
+    test('REGISTER_015: Kiểm tra đăng ký nếu để trống trường dữ liệu "Họ và tên"', async ({ registerPage }) => {
+        // Không nhập nội dung vào trường "Họ và tên"
+        // Nhấn "Đăng ký"
+        await registerPage.getBtnRegister().click();
+
+        // Hệ thống hiển thị thông báo ngay dưới textField "Họ và tên"
+        const errMsg = registerPage.getErrorMessage('Họ và tên không được để trống');
+        await expect(errMsg).toBeVisible();
     });
 
 });
