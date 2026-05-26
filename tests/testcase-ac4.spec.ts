@@ -30,6 +30,8 @@ test.describe('AC4: Email Field Validation', () => {
     });
 
     test('REGISTER_018: Kiểm tra đăng ký thất bại với email đã được đăng ký', async ({ registerPage, page }) => {
+        test.slow(); // Server demo6 phản hồi chậm, tăng timeout lên 3x (90 giây)
+
         // Nhập email đã tồn tại trong hệ thống vào trường "Email"
         const existingEmail = 'thithao25082004@gmail.com';
         await registerPage.enterUsername('testuser01');
@@ -38,7 +40,7 @@ test.describe('AC4: Email Field Validation', () => {
         await registerPage.enterPhone('0987654321');
         await registerPage.enterPassword('Password@123');
         await registerPage.enterConfirmPassword('Password@123');
-        await registerPage.selectDateOfBirth('01/01/2000');
+        await registerPage.selectDateOfBirth('2000-01-01');
         await registerPage.selectGender('Nam');
         await registerPage.getBtnRegister().click();
 
